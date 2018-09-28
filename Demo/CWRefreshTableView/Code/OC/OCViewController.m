@@ -42,15 +42,15 @@
     /// 这里模拟网络请求.
     NSInteger count = self.tableView.pageSize;
     NSMutableArray *arr = [NSMutableArray array];
-    if (pageIndex < 5)
-    {
-        // 前四页有数据
-        for (int i = 0; i < count; i++)
-        {
-            NSInteger number = (pageIndex - 1) * count + i;
-            [arr addObject:@(number)];
-        }
-    }
+//    if (pageIndex < 5)
+//    {
+//        // 前四页有数据
+//        for (int i = 0; i < count; i++)
+//        {
+//            NSInteger number = (pageIndex - 1) * count + i;
+//            [arr addObject:@(number)];
+//        }
+//    }
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self handleData:arr pageIndex:pageIndex];

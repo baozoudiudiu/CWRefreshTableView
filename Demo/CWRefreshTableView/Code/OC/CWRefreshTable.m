@@ -13,6 +13,8 @@
 }
 @property (nonatomic, copy) void (^refreshBlock)(void);
 @property (nonatomic, copy) void (^loadMoreBlock)(void);
+
+@property (nonatomic, strong) UIView                    *noDataView;
 @end
 
 
@@ -124,6 +126,15 @@
                     [self.mj_footer resetNoMoreData];
                 }
             }
+            
+            if (dataCount > 0)
+            {
+                [self hiddenNoDataView];
+            }
+            else
+            {
+                [self showNoDataView];
+            }
         }
             break;
         case CWRefreshTableRefreshType_loadMore:
@@ -142,6 +153,23 @@
         }
             break;
     }
+}
+
+- (UIView *)showNoDataView {
+    if (self.mj_footer)
+    {
+        self.mj_footer.hidden = YES;
+    }
+    
+    self.noDataView.hidden = NO;
+    
+    return self.noDataView;
+}
+
+
+- (UIView *)hiddenNoDataView {
+    self.noDataView.hidden = YES;
+    return self.noDataView;
 }
 
 #pragma mark - CONFIGURE UI 设置
@@ -202,4 +230,35 @@
     }
 }
 
+- (void)customNoDataView:(UIView *)nodataView {
+    if (nodataView)
+    {
+        [self.noDataView removeFromSuperview];
+        nodataView.center = CGPointMake(CGRectGetWidth(self.frame) * 0.5
+                                        , CGRectGetHeight(self.frame) * 0.5);
+        self.noDataView = nodataView;
+        self.noDataView.hidden = YES;
+        [self addSubview:self.noDataView];
+    }
+    
+}
+
+#pragma mark - GETTER
+- (UIView *)noDataView {
+    if(!_noDataView)
+    {
+        self.noDataView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.frame), 30)];
+        
+        UILabel *label = [[UILabel alloc] initWithFrame:_noDataView.bounds];
+        label.textAlignment = NSTextAlignmentCenter;
+        label.text = @"没有数据";
+        [_noDataView addSubview:label];
+        
+        _noDataView.center = CGPointMake(CGRectGetWidth(self.frame) * 0.5
+                                             , CGRectGetHeight(self.frame) * 0.5);
+        _noDataView.hidden = NO;
+        [self addSubview:_noDataView];
+    }
+    return _noDataView;
+}
 @end

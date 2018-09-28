@@ -45,6 +45,29 @@ typedef NS_ENUM(NSUInteger, CWRefreshTableRefreshType) {
 
 
 /**
+ 代码手动调用,展示数据缺省图 (基本用不上,控件内部有处理)
+
+ @return 数据缺省图控件
+ */
+- (UIView *)showNoDataView;
+
+
+/**
+ 代码手动调用,隐藏数据缺省图 (基本用不上,控件内部有处理)
+
+ @return 数据缺省图控件
+ */
+- (UIView *)hiddenNoDataView;
+
+
+/**
+ 如果需要自定义缺省图,使用该方法
+
+ @param nodataView 自定义缺省图
+ */
+- (void)customNoDataView:(UIView *)nodataView;
+
+/**
  结束刷新
 
  @param desArr 请求到的数据源数组
