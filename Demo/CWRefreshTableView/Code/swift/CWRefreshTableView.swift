@@ -2,7 +2,7 @@
 //  CWRefreshTableView.swift
 //  CWRefreshTableView
 //
-//  Created by 罗泰 on 2018/9/26.
+//  Created by chenwang on 2018/9/26.
 //  Copyright © 2018年 chenwang. All rights reserved.
 //
 
@@ -28,7 +28,7 @@ class CWRefreshTableView: UITableView {
     fileprivate var loadMoreBlock: (()->Void)?
     
     /// 分页每页数据量,默认为10
-    var pageSize: Int = 10
+    var pageSize: Int = 20
     
     /// 数据缺省图
     var noDataRemindView: UIView! {
@@ -44,8 +44,8 @@ class CWRefreshTableView: UITableView {
             noDataRemindView.isHidden = true
         }
     }
-
-
+    
+    
     //MARK: - 构造方法 INITIAL
     override init(frame: CGRect, style: UITableView.Style) {
         super.init(frame: frame,
@@ -59,6 +59,11 @@ class CWRefreshTableView: UITableView {
         
     }
     
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        self.configureView()
+    }
 }
 
 
@@ -70,7 +75,7 @@ extension CWRefreshTableView {
         self.estimatedRowHeight = 0
         self.estimatedSectionHeaderHeight = 0
         self.estimatedSectionFooterHeight = 0
-        
+        self.tableFooterView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: 1, height: 0.01))
         self.defaultNoDataView()
     }
     
@@ -78,14 +83,22 @@ extension CWRefreshTableView {
     fileprivate func defaultNoDataView() {
         let view = UIView.init(frame: CGRect.init(x: 0, y: 0, width: self.frame.width, height: 30))
         let label = UILabel.init(frame: view.bounds)
-        label.textAlignment = .center
         label.text = "没有数据"
+        label.textAlignment = .center
         view.addSubview(label)
         self.addSubview(view)
-        view.center = CGPoint.init(x: self.frame.width * 0.5,
-                                   y: self.frame.height * 0.5)
         self.noDataRemindView = view
         self.noDataRemindView.isHidden = true
+        
+        label.snp.makeConstraints { (make) in
+            make.top.left.bottom.right.equalToSuperview()
+        }
+        
+        view.snp.makeConstraints { (make) in
+            make.centerY.equalTo(self.snp.centerY)
+            make.centerX.equalToSuperview()
+            make.height.equalTo(30)
+        }
     }
 }
 
@@ -113,31 +126,31 @@ extension CWRefreshTableView {
         switch refreshType
         {
         case .refresh:()
-            if self.mj_header.isRefreshing
-            {
-                self.mj_header.endRefreshing()
-            }
+        if self.mj_header.isRefreshing
+        {
+            self.mj_header.endRefreshing()
+        }
         
-            self.mj_footer?.isHidden = self.noDataViewIsShow()
+        self.mj_footer?.isHidden = self.noDataViewIsShow()
+        if pageCount < self.pageSize
+        {
+            self.mj_footer?.endRefreshingWithNoMoreData()
+        }
+        else
+        {
+            self.mj_footer?.resetNoMoreData()
+            }
+        case .loadmore:()
+        if self.mj_footer.isRefreshing
+        {
             if pageCount < self.pageSize
             {
-                self.mj_footer?.endRefreshingWithNoMoreData()
+                self.mj_footer.endRefreshingWithNoMoreData()
             }
             else
             {
-                self.mj_footer?.resetNoMoreData()
+                self.mj_footer.endRefreshing()
             }
-        case .loadmore:()
-            if self.mj_footer.isRefreshing
-            {
-                if pageCount < self.pageSize
-                {
-                    self.mj_footer.endRefreshingWithNoMoreData()
-                }
-                else
-                {
-                    self.mj_footer.endRefreshing()
-                }
             }
         }
     }
@@ -201,7 +214,7 @@ extension CWRefreshTableView {
         }
         
         var refreshHeader: MJRefreshHeader = MJRefreshNormalHeader.init(refreshingTarget: self,
-                                                 refreshingAction: #selector(refreshHandle))
+                                                                        refreshingAction: #selector(refreshHandle))
         if let _ = header
         {
             refreshHeader = T(refreshingTarget: self,
